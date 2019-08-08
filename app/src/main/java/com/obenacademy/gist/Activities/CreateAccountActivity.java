@@ -19,8 +19,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.obenacademy.gist.R;
-
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 public class CreateAccountActivity extends AppCompatActivity {
 
@@ -31,9 +35,11 @@ public class CreateAccountActivity extends AppCompatActivity {
     private Button createAccountBtn;
     private DatabaseReference mDatabaseReference;
     private FirebaseDatabase mDatabase;
+    private StorageReference mFirebaseStorage;
     private FirebaseAuth mAuth;
     private ProgressDialog mProgressDialog;
     private ImageButton profilePic;
+    private Uri resultUri = null;
     private final static int GALLERY_CODE = 1;
 
     @Override
@@ -48,6 +54,8 @@ public class CreateAccountActivity extends AppCompatActivity {
         mDatabaseReference = mDatabase.getReference().child("Users");
 
         mAuth = FirebaseAuth.getInstance();
+
+        mFirebaseStorage = FirebaseStorage.getInstance().getReference().child("Gist_Profile_Pics");
 
         mProgressDialog = new ProgressDialog(this);
 
@@ -96,7 +104,34 @@ public class CreateAccountActivity extends AppCompatActivity {
                         public void onSuccess(AuthResult authResult) {
                             if(authResult != null) {
 
-                                String userid = mAuth.getCurrentUser().getUid();
+                                StorageReference imagePath = mFirebaseStorage.child("Gist_Profile_Pics")
+                                        .child(resultUri.getLastPathSegment());
+
+            imagePath.putFile(resultUri).addOnSuccessListener (new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+              String userid = mAuth.getCurrentUser().getUid();
+
+                DatabaseReference currenUserDb = mDatabaseReference.child(userid);
+                currenUserDb.child("firstname").setValue(name);
+                currenUserDb.child("lastname").setValue(lname);
+                currenUserDb.child("image").setValue(resultUri.toString());
+
+                mProgressDialog.dismiss();
+
+                //send users to postList
+
+                Intent intent = new Intent(CreateAccountActivity.this, PostListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                 startActivity(intent);
+
+                }
+            });
+
+
+                               /* String userid = mAuth.getCurrentUser().getUid();
+
                                 DatabaseReference currenUserDb = mDatabaseReference.child(userid);
                                 currenUserDb.child("firstname").setValue(name);
                                 currenUserDb.child("lastname").setValue(lname);
@@ -108,7 +143,7 @@ public class CreateAccountActivity extends AppCompatActivity {
 
                                 Intent intent = new Intent(CreateAccountActivity.this, PostListActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
+                                startActivity(intent);*/
                             }
 
                         }
@@ -120,10 +155,29 @@ public class CreateAccountActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GALLERY_CODE && resultCode == RESULT_OK) {
+        if (requestCode == GALLERY_CODE && resultCode == RESULT_OK && data !=null) {
             Uri mImageUri = data.getData();
+
+            CropImage.activity(mImageUri)
+                    .setGuidelines( CropImageView.Guidelines.ON)
+                    .setAspectRatio (1, 1)
+                    .start(this);
 
 
         }
+
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                resultUri = result.getUri();
+
+                profilePic.setImageURI (resultUri);
+
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
+        }
+
+        }
     }
-}
+
