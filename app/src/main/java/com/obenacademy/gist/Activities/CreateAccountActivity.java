@@ -44,140 +44,125 @@ public class CreateAccountActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_account);
+        super.onCreate ( savedInstanceState );
+        setContentView ( R.layout.activity_create_account );
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar toolbar = findViewById ( R.id.toolbar );
+        setSupportActionBar ( toolbar );
 
-        mDatabase = FirebaseDatabase.getInstance();
-        mDatabaseReference = mDatabase.getReference().child("Users");
+        mDatabase = FirebaseDatabase.getInstance ();
+        mDatabaseReference = mDatabase.getReference ().child ( "Users" );
 
-        mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance ();
 
-        mFirebaseStorage = FirebaseStorage.getInstance().getReference().child("Gist_Profile_Pics");
+        mFirebaseStorage = FirebaseStorage.getInstance ().getReference ().child ( "Gist_Profile_Pics" );
 
-        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog = new ProgressDialog ( this );
 
-        firstName = (EditText) findViewById(R.id.firstNameAct);
-        lastName = (EditText) findViewById(R.id.lastNameAct);
-        email = (EditText) findViewById(R.id.emailAct);
-        password = (EditText) findViewById(R.id.passwordAct);
-        profilePic =(ImageButton) findViewById(R.id.profilePic);
-        createAccountBtn = (Button) findViewById(R.id.createAccountAct);
+        firstName = (EditText) findViewById ( R.id.firstNameAct );
+        lastName = (EditText) findViewById ( R.id.lastNameAct );
+        email = (EditText) findViewById ( R.id.emailAct );
+        password = (EditText) findViewById ( R.id.passwordAct );
+        profilePic = (ImageButton) findViewById ( R.id.profilePic );
+        createAccountBtn = (Button) findViewById ( R.id.createAccountAct );
 
-        profilePic.setOnClickListener(new View.OnClickListener() {
+        profilePic.setOnClickListener ( new View.OnClickListener () {
             @Override
             public void onClick(View v) {
-                Intent galleryIntent = new Intent();
-                galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-                galleryIntent.setType("image/*");
-                startActivityForResult(galleryIntent, GALLERY_CODE);
+                Intent galleryIntent = new Intent ();
+                galleryIntent.setAction ( Intent.ACTION_GET_CONTENT );
+                galleryIntent.setType ( "image/*" );
+                startActivityForResult ( galleryIntent, GALLERY_CODE );
 
             }
-        });
+        } );
 
-        createAccountBtn.setOnClickListener(new View.OnClickListener() {
+        createAccountBtn.setOnClickListener ( new View.OnClickListener () {
             @Override
             public void onClick(View v) {
-                createNewAccount();
+                createNewAccount ();
             }
-        });
+        } );
     }
 
     private void createNewAccount() {
 
-        final String name = firstName.getText().toString().trim();
-        final String lname = lastName.getText().toString().trim();
-        String em = email.getText().toString().trim();
-        String pwd = password.getText().toString().trim();
+        final String name = firstName.getText ().toString ().trim ();
+        final String lname = lastName.getText ().toString ().trim ();
+        String em = email.getText ().toString ().trim ();
+        String pwd = password.getText ().toString ().trim ();
 
-        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(lname)
-                && !TextUtils.isEmpty(em) && !TextUtils.isEmpty(pwd)) {
+        if (!TextUtils.isEmpty ( name ) && !TextUtils.isEmpty ( lname )
+                && !TextUtils.isEmpty ( em ) && !TextUtils.isEmpty ( pwd )) {
 
-            mProgressDialog.setMessage("Creating Account");
-            mProgressDialog.show();
+            mProgressDialog.setMessage ( "Creating Account" );
+            mProgressDialog.show ();
 
-            mAuth.createUserWithEmailAndPassword(em, pwd)
-                    .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+            mAuth.createUserWithEmailAndPassword ( em, pwd )
+                    .addOnSuccessListener ( new OnSuccessListener<AuthResult> () {
                         @Override
                         public void onSuccess(AuthResult authResult) {
-                            if(authResult != null) {
+                            if (authResult != null) {
 
-                                StorageReference imagePath = mFirebaseStorage.child("Gist_Profile_Pics")
-                                        .child(resultUri.getLastPathSegment());
+                                StorageReference imagePath = mFirebaseStorage.child ( "Gist_Profile_Pics" )
+                                        .child ( resultUri.getLastPathSegment () );
 
-            imagePath.putFile(resultUri).addOnSuccessListener (new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                imagePath.putFile ( resultUri ).addOnSuccessListener ( new OnSuccessListener<UploadTask.TaskSnapshot> () {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-              String userid = mAuth.getCurrentUser().getUid();
+                                        String userid = mAuth.getCurrentUser ().getUid ();
 
-                DatabaseReference currenUserDb = mDatabaseReference.child(userid);
-                currenUserDb.child("firstname").setValue(name);
-                currenUserDb.child("lastname").setValue(lname);
-                currenUserDb.child("image").setValue(resultUri.toString());
+                                        DatabaseReference currenUserDb = mDatabaseReference.child ( userid );
+                                        currenUserDb.child ( "firstname" ).setValue ( name );
+                                        currenUserDb.child ( "lastname" ).setValue ( lname );
+                                        currenUserDb.child ( "image" ).setValue ( resultUri.toString () );
 
-                mProgressDialog.dismiss();
+                                        mProgressDialog.dismiss ();
 
-                //send users to postList
+                                        //send users to postList
 
-                Intent intent = new Intent(CreateAccountActivity.this, PostListActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                 startActivity(intent);
+                                        Intent intent = new Intent ( CreateAccountActivity.this, PostListActivity.class );
+                                        intent.addFlags ( Intent.FLAG_ACTIVITY_CLEAR_TOP );
+                                        startActivity ( intent );
 
-                }
-            });
+                                    }
+                                } );
 
-
-                               /* String userid = mAuth.getCurrentUser().getUid();
-
-                                DatabaseReference currenUserDb = mDatabaseReference.child(userid);
-                                currenUserDb.child("firstname").setValue(name);
-                                currenUserDb.child("lastname").setValue(lname);
-                                currenUserDb.child("image").setValue("none");
-
-                                mProgressDialog.dismiss();
-
-                                //send users to postList
-
-                                Intent intent = new Intent(CreateAccountActivity.this, PostListActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);*/
                             }
 
                         }
-                    });
+                    } );
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult ( requestCode, resultCode, data );
 
-        if (requestCode == GALLERY_CODE && resultCode == RESULT_OK && data !=null) {
-            Uri mImageUri = data.getData();
+        if (requestCode == GALLERY_CODE && resultCode == RESULT_OK && data != null) {
+            Uri mImageUri = data.getData ();
 
-            CropImage.activity(mImageUri)
-                    .setGuidelines( CropImageView.Guidelines.ON)
-                    .setAspectRatio (1, 1)
-                    .start(this);
+            CropImage.activity ( mImageUri )
+                    .setGuidelines ( CropImageView.Guidelines.ON )
+                    .setAspectRatio ( 1, 1 )
+                    .start ( this );
 
 
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            CropImage.ActivityResult result = CropImage.getActivityResult ( data );
             if (resultCode == RESULT_OK) {
-                resultUri = result.getUri();
+                resultUri = result.getUri ();
 
-                profilePic.setImageURI (resultUri);
+                profilePic.setImageURI ( resultUri );
 
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Exception error = result.getError();
+                Exception error = result.getError ();
             }
         }
 
-        }
     }
+}
 

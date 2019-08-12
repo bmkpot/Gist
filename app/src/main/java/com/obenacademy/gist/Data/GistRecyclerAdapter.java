@@ -1,6 +1,7 @@
 package com.obenacademy.gist.Data;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.storage.FirebaseStorage;
+import com.obenacademy.gist.Activities.AddPostActivity;
+import com.obenacademy.gist.Activities.MainActivity;
+import com.obenacademy.gist.Activities.PostListActivity;
+import com.obenacademy.gist.Activities.SingleActivity;
 import com.obenacademy.gist.Model.Gist;
 import com.obenacademy.gist.R;
 import com.squareup.picasso.Picasso;
@@ -17,6 +22,8 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+
+import static android.support.v4.content.ContextCompat.startActivity;
 
 public class GistRecyclerAdapter extends RecyclerView.Adapter<GistRecyclerAdapter.ViewHolder> {
 
@@ -76,7 +83,7 @@ public class GistRecyclerAdapter extends RecyclerView.Adapter<GistRecyclerAdapte
         public ImageView image;
         String userid;
 
-        public ViewHolder(@NonNull View view, Context ctx) {
+        public ViewHolder(@NonNull final View view, final Context ctx) {
             super(view);
 
             context = ctx;
@@ -92,6 +99,9 @@ public class GistRecyclerAdapter extends RecyclerView.Adapter<GistRecyclerAdapte
                 @Override
                 public void onClick(View v) {
                     //we can go to the next activity
+
+
+
                 }
             });
         }

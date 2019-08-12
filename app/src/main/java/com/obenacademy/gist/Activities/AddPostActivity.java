@@ -108,8 +108,6 @@ public class AddPostActivity extends AppCompatActivity {
         final String descVal = mPostDesc.getText().toString().trim();
 
         if (!TextUtils.isEmpty(titleVal) && !TextUtils.isEmpty(descVal) && mImageUri != null) {
-            //start the uploading
-            //mImageUri.getLastPathSegment == /image/myphoto.jpeg
 
             final StorageReference filePath = mStorage.child ("Gist_images")
                     .child((mImageUri.getLastPathSegment ()));
