@@ -63,7 +63,7 @@ public class GistRecyclerAdapter extends RecyclerView.Adapter<GistRecyclerAdapte
 
         imageUrl = gist.getImage();
 
-        //ToDo: Use picasso library to load image
+        // Use picasso library to load image
 
         Picasso.with(context)
                 .load(imageUrl)
@@ -98,7 +98,9 @@ public class GistRecyclerAdapter extends RecyclerView.Adapter<GistRecyclerAdapte
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //we can go to the next activity
+                    // go to the SingleActivity
+                  //  Intent intent = new Intent(getApplicationContext(), SingleActivity.class);
+
 
 
 
