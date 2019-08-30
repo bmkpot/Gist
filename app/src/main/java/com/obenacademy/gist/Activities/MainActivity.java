@@ -36,112 +36,112 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        super.onCreate ( savedInstanceState );
+        setContentView ( R.layout.activity_main );
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar toolbar = findViewById ( R.id.toolbar );
+        setSupportActionBar ( toolbar );
 
-        mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance ();
 
-        emailField = (EditText) findViewById(R.id.loginEmail);
-        passwordField = (EditText) findViewById(R.id.loginPassword);
-        createActButton = (Button) findViewById(R.id.loginCreateAccount);
-        loginButton = (Button) findViewById(R.id.loginButton);
+        emailField = (EditText) findViewById ( R.id.loginEmail );
+        passwordField = (EditText) findViewById ( R.id.loginPassword );
+        createActButton = (Button) findViewById ( R.id.loginCreateAccount );
+        loginButton = (Button) findViewById ( R.id.loginButton );
 
-        createActButton.setOnClickListener(new View.OnClickListener() {
+        createActButton.setOnClickListener ( new View.OnClickListener () {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, CreateAccountActivity.class));
-                finish();
+                startActivity ( new Intent ( MainActivity.this, CreateAccountActivity.class ) );
+                finish ();
             }
-        });
+        } );
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
+        mAuthListener = new FirebaseAuth.AuthStateListener () {
 
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
 
-                mUser = firebaseAuth.getCurrentUser();
+                mUser = firebaseAuth.getCurrentUser ();
 
                 if (mUser != null) {
-                    Toast.makeText(MainActivity.this, "Signed In", Toast.LENGTH_LONG).show();
-                    startActivity(new Intent(MainActivity.this, PostListActivity.class));
-                    finish();
+                    Toast.makeText ( MainActivity.this, "Signed In", Toast.LENGTH_LONG ).show ();
+                    startActivity ( new Intent ( MainActivity.this, PostListActivity.class ) );
+                    finish ();
 
                 } else {
-                    Toast.makeText(MainActivity.this, "Not Signed In", Toast.LENGTH_LONG).show();
+                    Toast.makeText ( MainActivity.this, "Not Signed In", Toast.LENGTH_LONG ).show ();
                 }
             }
         };
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        loginButton.setOnClickListener ( new View.OnClickListener () {
             @Override
             public void onClick(View v) {
-                if (!TextUtils.isEmpty(emailField.getText().toString())
-                && !TextUtils.isEmpty(passwordField.getText().toString())) {
+                if (!TextUtils.isEmpty ( emailField.getText ().toString () )
+                        && !TextUtils.isEmpty ( passwordField.getText ().toString () )) {
 
-                    String email = emailField.getText().toString();
-                    String password = passwordField.getText().toString();
+                    String email = emailField.getText ().toString ();
+                    String password = passwordField.getText ().toString ();
 
-                    login(email, password);
+                    login ( email, password );
 
-                }else {
+                } else {
 
                 }
             }
-        });
+        } );
 
     }
 
     private void login(String email, String password) {
 
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword ( email, password )
+                .addOnCompleteListener ( this, new OnCompleteListener<AuthResult> () {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        if (task.isSuccessful()) {
+                        if (task.isSuccessful ()) {
                             //We are sign in
-                            Toast.makeText(MainActivity.this, "Signed in", Toast.LENGTH_LONG).show();
+                            Toast.makeText ( MainActivity.this, "Signed in", Toast.LENGTH_LONG ).show ();
 
-                            startActivity(new Intent(MainActivity.this, PostListActivity.class));
-                            finish();
+                            startActivity ( new Intent ( MainActivity.this, PostListActivity.class ) );
+                            finish ();
 
-                        }else {
+                        } else {
                             //Not in
 
                         }
 
                     }
-                });
+                } );
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId() == R.id.action_signout){
-            mAuth.signOut();
+        if (item.getItemId () == R.id.action_signout) {
+            mAuth.signOut ();
         }
-        return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected ( item );
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater ().inflate ( R.menu.main_menu, menu );
+        return super.onCreateOptionsMenu ( menu );
     }
 
     @Override
     protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
+        super.onStart ();
+        mAuth.addAuthStateListener ( mAuthListener );
     }
 
     @Override
     protected void onStop() {
-        super.onStop();
-        if (mAuthListener != null){
-            mAuth.removeAuthStateListener(mAuthListener);
+        super.onStop ();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener ( mAuthListener );
         }
     }
 }

@@ -99,10 +99,6 @@ public class GistRecyclerAdapter extends RecyclerView.Adapter<GistRecyclerAdapte
                 @Override
                 public void onClick(View v) {
                     // go to the SingleActivity
-                  //  Intent intent = new Intent(getApplicationContext(), SingleActivity.class);
-
-
-
 
                 }
             });

@@ -38,74 +38,81 @@ public class PostListActivity<gist> extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post_list);
+        super.onCreate (savedInstanceState);
+        setContentView (R.layout.activity_post_list);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar toolbar = findViewById (R.id.toolbar);
+        setSupportActionBar ( toolbar );
 
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
+        mAuth = FirebaseAuth.getInstance ();
+        mUser = mAuth.getCurrentUser ();
 
-        mDatabase = FirebaseDatabase.getInstance();
-        mDatabaseReference = mDatabase.getReference().child("Gist");
+        mDatabase = FirebaseDatabase.getInstance ();
+        mDatabaseReference = mDatabase.getReference ().child ("Gist");
         mDatabaseReference.keepSynced(true);
 
-        gistList = new ArrayList<>();
+        gistList = new ArrayList<> ();
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView = (RecyclerView) findViewById ( R.id.recyclerView );
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(gistRecyclerAdapter);
+        recyclerView.setLayoutManager (new LinearLayoutManager (this));
+        recyclerView.setAdapter (gistRecyclerAdapter);
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater ().inflate (R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu (menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
+        switch (item.getItemId ()) {
             case R.id.action_add:
                 if (mUser != null && mAuth != null) {
 
-                    startActivity(new Intent(PostListActivity.this, AddPostActivity.class));
-                    finish();
+                    startActivity (new Intent (PostListActivity.this, AddPostActivity.class));
+                    finish ();
                 }
                 break;
             case R.id.action_signout:
 
                 if (mUser != null && mAuth != null) {
-                    mAuth.signOut();
+                    mAuth.signOut ();
 
-                    startActivity(new Intent(PostListActivity.this, MainActivity.class));
-                    finish();
+                    startActivity (new Intent(PostListActivity.this, MainActivity.class));
+                    finish ();
+                }
+                break;
+            case R.id.action_delete:
+                if (mUser != null && mAuth != null) {
+
+                    startActivity ( new Intent (PostListActivity.this, PostListActivity.class));
+                    finish ();
                 }
         }
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected (item);
+    }
 
     @Override
     protected void onStart() {
-        super.onStart();
+        super.onStart ();
 
-        mDatabaseReference.addChildEventListener(new ChildEventListener() {
+        mDatabaseReference.addChildEventListener (new ChildEventListener () {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                Gist gist = dataSnapshot.getValue(Gist.class);
+                Gist gist = dataSnapshot.getValue (Gist.class);
 
-                gistList.add(gist);
+                gistList.add (gist);
 
-                Collections.reverse(gistList);
+                Collections.reverse (gistList);
 
                 gistRecyclerAdapter = new GistRecyclerAdapter(PostListActivity.this, gistList);
-                recyclerView.setAdapter(gistRecyclerAdapter);
-                gistRecyclerAdapter.notifyDataSetChanged();
+                recyclerView.setAdapter (gistRecyclerAdapter);
+                gistRecyclerAdapter.notifyDataSetChanged ();
 
             }
 
@@ -128,6 +135,6 @@ public class PostListActivity<gist> extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        } );
     }
 }

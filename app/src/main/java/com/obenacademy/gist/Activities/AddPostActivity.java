@@ -46,103 +46,104 @@ public class AddPostActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate (savedInstanceState);
-        setContentView (R.layout.activity_add_post);
+        super.onCreate ( savedInstanceState );
+        setContentView ( R.layout.activity_add_post );
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar toolbar = findViewById ( R.id.toolbar );
+        setSupportActionBar ( toolbar );
 
-        mProgress = new ProgressDialog(this);
+        mProgress = new ProgressDialog ( this );
 
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
-        mStorage = FirebaseStorage.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance ();
+        mUser = mAuth.getCurrentUser ();
+        mStorage = FirebaseStorage.getInstance ().getReference ();
 
-        mPostDatabase = FirebaseDatabase.getInstance().getReference().child("Gist");
+        mPostDatabase = FirebaseDatabase.getInstance ().getReference ().child ( "Gist" );
 
         mPostImage = (ImageButton) findViewById ( R.id.profilePic );
         mPostTitle = (EditText) findViewById ( R.id.postTitleBt );
         mPostDesc = (EditText) findViewById ( R.id.descriptionBt );
         mSubmitButton = (Button) findViewById ( R.id.submitPost );
 
-        mPostImage.setOnClickListener( new View.OnClickListener () {
+
+        mPostImage.setOnClickListener ( new View.OnClickListener () {
             @Override
             public void onClick(View v) {
                 Intent galleryIntent = new Intent ( Intent.ACTION_GET_CONTENT );
-                galleryIntent.setType ("image/*");
-                galleryIntent.setAction (Intent.ACTION_GET_CONTENT);
-                startActivityForResult (galleryIntent, GALLERY_CODE);
+                galleryIntent.setType ( "image/*" );
+                galleryIntent.setAction ( Intent.ACTION_GET_CONTENT );
+                startActivityForResult ( galleryIntent, GALLERY_CODE );
 
             }
         } );
 
 
-        mSubmitButton.setOnClickListener( new View.OnClickListener () {
+        mSubmitButton.setOnClickListener ( new View.OnClickListener () {
             @Override
             public void onClick(View v) {
                 //Posting to our database
-                startPosting();
+                startPosting ();
             }
-        });
-
+        } );
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult ( requestCode, resultCode, data );
 
         if (requestCode == GALLERY_CODE && resultCode == RESULT_OK) {
 
-            mImageUri = data.getData();
-            mPostImage.setImageURI(mImageUri);
+            mImageUri = data.getData ();
+            mPostImage.setImageURI ( mImageUri );
         }
     }
 
     private void startPosting() {
 
-        mProgress.setMessage("Posting message...");
+        mProgress.setMessage ( "Posting message..." );
         mProgress.show ();
 
-        final String titleVal = mPostTitle.getText().toString().trim();
-        final String descVal = mPostDesc.getText().toString().trim();
+        final String titleVal = mPostTitle.getText ().toString ().trim ();
+        final String descVal = mPostDesc.getText ().toString ().trim ();
 
-        if (!TextUtils.isEmpty(titleVal) && !TextUtils.isEmpty(descVal) && mImageUri != null) {
+        if (!TextUtils.isEmpty ( titleVal ) && !TextUtils.isEmpty ( descVal ) && mImageUri != null) {
 
-            final StorageReference filePath = mStorage.child ("Gist_images")
-                    .child((mImageUri.getLastPathSegment ()));
+            final StorageReference filePath = mStorage.child ( "Gist_images" )
+                    .child ( (mImageUri.getLastPathSegment ()) );
 
 
-            filePath.putFile(mImageUri).addOnCompleteListener (new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            filePath.putFile ( mImageUri ).addOnCompleteListener ( new OnCompleteListener<UploadTask.TaskSnapshot> () {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
-                    if (task.isSuccessful()) {
+                    if (task.isSuccessful ()) {
 
-                        filePath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        filePath.getDownloadUrl ().addOnSuccessListener ( new OnSuccessListener<Uri> () {
                             @Override
                             public void onSuccess(Uri uri) {
-                                String downloadUrl = uri.toString();
+                                String downloadUrl = uri.toString ();
 
 
-                                DatabaseReference newPost = mPostDatabase.push();
+                                DatabaseReference newPost = mPostDatabase.push ();
 
 
-                                Map<String, String> dataToSave = new HashMap<>();
-                                dataToSave.put("title", titleVal);
-                                dataToSave.put("desc", descVal);
-                                dataToSave.put("image", downloadUrl);
-                                dataToSave.put("timestamp",String.valueOf(java.lang.System.currentTimeMillis()));
-                                dataToSave.put("userid", mUser.getUid () );
+                                Map<String, String> dataToSave = new HashMap<> ();
+                                dataToSave.put ( "title", titleVal );
+                                dataToSave.put ( "desc", descVal );
+                                dataToSave.put ( "image", downloadUrl );
+                                dataToSave.put ( "timestamp", String.valueOf ( java.lang.System.currentTimeMillis () ) );
+                                dataToSave.put ( "userid", mUser.getUid () );
 
-                                newPost.setValue (dataToSave);
-                                mProgress.dismiss();
+                                newPost.setValue ( dataToSave );
+                                mProgress.dismiss ();
 
-                                startActivity (new Intent(AddPostActivity.this, PostListActivity.class));
-                                finish();
+                                startActivity ( new Intent ( AddPostActivity.this, PostListActivity.class ) );
+                                finish ();
 
                             }
                         } );
+
 
                     }
                 }
